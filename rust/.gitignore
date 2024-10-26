@@ -1,0 +1,17 @@
+# Built artifacts
+/target/
+**/*.rs.bk
+
+# Cargo files
+Cargo.lock
+Cargo.toml
+
+# IDE files
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Environment
+.env
