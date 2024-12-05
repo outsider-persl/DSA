@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KMP Algorithm Visualization</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      margin: 20px auto;
+      max-width: 800px;
+      text-align: center;
+    }
+    .input-box {
+      margin-bottom: 20px;
+    }
+    .highlight {
+      background-color: #f9c74f;
+    }
+    .matched {
+      background-color: #90be6d;
+      color: white;
+    }
+    table {
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #000;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>KMP Algorithm Visualization</h1>
+    <div class="input-box">
+      <label for="text">Text: </label>
+      <input type="text" id="text" value="ababcabcacbab" />
+      <br>
+      <label for="pattern">Pattern: </label>
+      <input type="text" id="pattern" value="abcac" />
+    </div>
+    <button onclick="startKMP()">Start KMP</button>
+    <div id="output"></div>
+  </div>
+
+  <script>
+    function computeNext(pattern) {
+      const next = Array(pattern.length).fill(0);
+      let j = 0;
+      for (let i = 1; i < pattern.length; i++) {
+        while (j > 0 && pattern[i] !== pattern[j]) {
+          j = next[j - 1];
+        }
+        if (pattern[i] === pattern[j]) {
+          j++;
+        }
+        next[i] = j;
+      }
+      return next;
+    }
+
+    function startKMP() {
+      const text = document.getElementById("text").value;
+      const pattern = document.getElementById("pattern").value;
+
+      const output = document.getElementById("output");
+      output.innerHTML = "";
+
+      const next = computeNext(pattern);
+      output.innerHTML += `<h3>Step 1: Compute Next Array</h3>`;
+      output.innerHTML += generateNextTable(pattern, next);
+
+      output.innerHTML += `<h3>Step 2: Start Matching</h3>`;
+      kmpMatch(text, pattern, next, output);
+    }
+
+    function generateNextTable(pattern, next) {
+      let table = `<table><tr><th>Pattern</th>`;
+      for (let i = 0; i < pattern.length; i++) {
+        table += `<td>${pattern[i]}</td>`;
+      }
+      table += `</tr><tr><th>Next</th>`;
+      for (let i = 0; i < next.length; i++) {
+        table += `<td>${next[i]}</td>`;
+      }
+      table += `</tr></table>`;
+      return table;
+    }
+
+    function kmpMatch(text, pattern, next, output) {
+      let j = 0;
+      for (let i = 0; i < text.length; i++) {
+        while (j > 0 && text[i] !== pattern[j]) {
+          j = next[j - 1];
+          highlight(output, text, pattern, i, j);
+        }
+        if (text[i] === pattern[j]) {
+          j++;
+        }
+        highlight(output, text, pattern, i, j);
+        if (j === pattern.length) {
+          output.innerHTML += `<p class="matched">Pattern found at index ${i - j + 1}</p>`;
+          j = next[j - 1];
+        }
+      }
+    }
+
+    function highlight(output, text, pattern, textIndex, patternIndex) {
+      let highlightedText = text
+        .split("")
+        .map((char, index) =>
+          index === textIndex ? `<span class="highlight">${char}</span>` : char
+        )
+        .join("");
+
+      let highlightedPattern = pattern
+        .split("")
+        .map((char, index) =>
+          index < patternIndex ? `<span class="matched">${char}</span>` : char
+        )
+        .join("");
+
+      output.innerHTML += `<p>${highlightedText}</p>`;
+      output.innerHTML += `<p>${highlightedPattern}</p>`;
+    }
+  </script>
+</body>
+</html>
